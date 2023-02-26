@@ -50,20 +50,6 @@ let COMP = false;
 let AND = false;
 
 export { HLT, ADD, SUB, MUL, DIV, MOD, COMP, AND }
-/*
-let RAM_DATA: number[] = [
-    0b0000100100000001,
-    0b0000110000000011,
-
-    0b0000100100000011,
-    0b0000110000000100,
-
-    0b0000101100000101,
-
-
-    0b0000110000000111,
-    0b0000011000000000
-]*/
 
 
 // Components
@@ -152,15 +138,14 @@ let total_clock_ticks = 0;
     let progStart = performance.now();
     while (HLT === false) {
         total_clock_ticks++
-        let start = performance.now();
+
         ControlUnit();
-        let end = performance.now();
-        let time = end - start;
-        await wait((1 / Clock_Hertz) - time)
+
     }
 
     let progEnd = performance.now();
     let progTime = progEnd - progStart;
     console.log("Program took " + Round2DB(progTime) + "ms to run, with an average clock speed of " + Round2DB(progTime / total_clock_ticks) + "ms per clock tick or " + Round2DB(1000 / (progTime / total_clock_ticks)) + " hertz and did " + total_clock_ticks + " clock ticks");
+
 })();
 

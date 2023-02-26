@@ -1,63 +1,69 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ALU = void 0;
-var opcode_1 = require("./utils/opcode");
-var index_1 = require("./index");
-var Logger_1 = require("./utils/Logger");
-var ALU = /** @class */ (function () {
-    function ALU(_a) {
-        var BUS = _a.BUS, REG_A = _a.REG_A, REG_B = _a.REG_B, ACC = _a.ACC;
-        this.Zero = true;
-        this.Negative = false;
+const opcode_1 = require("./utils/opcode");
+const index_1 = require("./index");
+const Logger_1 = require("./utils/Logger");
+class ALU {
+    REG_A;
+    REG_B;
+    ACC;
+    BUS;
+    Zero = true;
+    Negative = false;
+    constructor({ BUS, REG_A, REG_B, ACC }) {
         this.REG_A = REG_A;
         this.REG_B = REG_B;
         this.ACC = ACC;
         this.BUS = BUS;
         this.start();
     }
-    ALU.prototype.getACC = function () {
+    getACC() {
         return this.ACC.getValue();
-    };
-    ALU.prototype.getREG_A = function () {
+    }
+    getREG_A() {
         return this.REG_A.getValue();
-    };
-    ALU.prototype.getREG_B = function () {
+    }
+    getREG_B() {
         return this.REG_B.getValue();
-    };
-    ALU.prototype.start = function () {
-        var _this = this;
-        this.BUS.listenToControlBus(function (data) {
-            var _a = (0, opcode_1.OpcodeSeparator)(data), opcode = _a.opcode, operand = _a.operand;
-            if (opcode === 1) {
-                if (operand === 3) {
-                    (0, Logger_1.Logger)("Setting REG_A to: " + _this.BUS.getDataBus());
-                    _this.REG_A.setValue(_this.BUS.getDataBus());
-                    _this.calc(_this.REG_A.getValue(), _this.REG_B.getValue());
-                }
-                if (operand === 4) {
-                    (0, Logger_1.Logger)("Setting REG_B to: " + _this.BUS.getDataBus());
-                    _this.REG_B.setValue(_this.BUS.getDataBus());
-                    _this.calc(_this.REG_A.getValue(), _this.REG_B.getValue());
-                }
+    }
+    start() {
+        this.BUS.listenToControlBus((data) => {
+            let { operand } = (0, opcode_1.OpcodeSeparator)(data);
+            if (operand === 0b00000011) {
+                (0, Logger_1.Logger)("Setting REG_A to: " + this.BUS.getDataBus());
+                this.REG_A.setValue(this.BUS.getDataBus());
+                this.calc(this.REG_A.getValue(), this.REG_B.getValue());
             }
-            ;
-            if (opcode === 13 && _this.Zero) {
+            if (operand === 0b00000100) {
+                (0, Logger_1.Logger)("Setting REG_B to: " + this.BUS.getDataBus());
+                this.REG_B.setValue(this.BUS.getDataBus());
+                this.calc(this.REG_A.getValue(), this.REG_B.getValue());
+            }
+        }, 0b00000001);
+        this.BUS.listenToControlBus((data) => {
+            let { operand } = (0, opcode_1.OpcodeSeparator)(data);
+            if (this.Zero) {
                 (0, Logger_1.Logger)("Jumping to: " + operand);
-                _this.BUS.hardCodeControlBus(5, operand);
+                this.BUS.hardCodeControlBus(0b00000101, operand);
             }
-            if (opcode === 14 && _this.Negative) {
+        }, 0b00001101);
+        this.BUS.listenToControlBus((data) => {
+            let { operand } = (0, opcode_1.OpcodeSeparator)(data);
+            if (this.Negative) {
                 (0, Logger_1.Logger)("Jumping to: " + operand);
-                _this.BUS.hardCodeControlBus(5, operand);
+                this.BUS.hardCodeControlBus(0b00000101, operand);
             }
-            if (opcode === 2) {
-                if (operand === 5) {
-                    (0, Logger_1.Logger)("Setting data bus to ACC value " + _this.ACC.getValue());
-                    _this.BUS.setDataBus(_this.ACC.getValue());
-                }
+        }, 0b00001110);
+        this.BUS.listenToControlBus((data) => {
+            let { operand } = (0, opcode_1.OpcodeSeparator)(data);
+            if (operand === 0b00000101) {
+                (0, Logger_1.Logger)("Setting data bus to ACC value " + this.ACC.getValue());
+                this.BUS.setDataBus(this.ACC.getValue());
             }
-        });
-    };
-    ALU.prototype.calc = function (a, b) {
+        }, 0b00000010);
+    }
+    calc(a, b) {
         if (index_1.SUB) {
             this.ACC.setValue(a - b);
         }
@@ -81,7 +87,6 @@ var ALU = /** @class */ (function () {
         }
         this.Zero = this.ACC.getValue() === 0;
         this.Negative = this.ACC.getValue() < 0;
-    };
-    return ALU;
-}());
+    }
+}
 exports.ALU = ALU;

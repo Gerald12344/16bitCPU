@@ -21,23 +21,35 @@ export class ProgramCounter {
     }
 
     private start() {
+
         this.BUS.listenToControlBus((data: number) => {
-            let { opcode, operand } = OpcodeSeparator(data);
 
-            if (opcode === 0b00000100) {
-                Logger("Incrementing PC")
-                this.PC.setValue(this.PC.getValue() + 1);
-            }
+            Logger("Incrementing PC")
+            this.PC.setValue(this.PC.getValue() + 1);
 
-            if (opcode === 0b00000010 && operand === 0b00000010) {
+        }, 0b00000100);
+
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
+
+            if (operand === 0b00000010) {
                 Logger("Setting data bus to PC value")
                 this.BUS.setDataBus(this.PC.getValue());
             }
 
-            if (opcode === 0b00000101) {
-                Logger("JUMP PC to: " + operand)
-                this.PC.setValue(operand);
-            }
-        });
+        }, 0b00000010);
+
+
+        this.BUS.listenToControlBus((data: number) => {
+
+            let { operand } = OpcodeSeparator(data);
+
+            Logger("JUMP PC to: " + operand)
+            this.PC.setValue(operand);
+
+        }, 0b00000101);
+
+
+
     }
 }

@@ -15,27 +15,31 @@ export class GeneralPurpose extends Register {
 
     public start() {
         this.BUS.listenToControlBus((data: number) => {
-            let { opcode, operand } = OpcodeSeparator(data);
+            let { operand } = OpcodeSeparator(data);
 
-            if (opcode === 0b00001011) {
-                Logger("Setting data bus to GP value")
-                this.BUS.hardCodeControlBus(0b00000010, operand);
-                let val = this.BUS.getDataBus();
-                this.setValue(val);
-            }
+            Logger("Setting data bus to GP value")
+            this.BUS.hardCodeControlBus(0b00000010, operand);
+            let val = this.BUS.getDataBus();
+            this.setValue(val);
 
-            if (opcode === 0b00001100) {
-                Logger("Setting data bus to GP value")
-                this.BUS.setDataBus(this.getValue());
-                this.BUS.hardCodeControlBus(0b00000001, operand);
-            }
+        }, 0b00001011);
 
-            if (opcode === 0b00001001) {
-                Logger("Setting GP value to: " + operand)
-                this.setValue(operand);
-            }
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
 
-        });
+            Logger("Setting data bus to GP value")
+            this.BUS.setDataBus(this.getValue());
+            this.BUS.hardCodeControlBus(0b00000001, operand);
+
+        }, 0b00001100);
+
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
+
+            Logger("Setting GP value to: " + operand)
+            this.setValue(operand);
+
+        }, 0b00001001);
     }
 
 

@@ -1,63 +1,63 @@
 "use strict";
 // Comp'ter bus controller
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BusController = void 0;
-var _1 = require(".");
-var BusController = /** @class */ (function () {
-    function BusController() {
+const _1 = require(".");
+const opcode_1 = require("./utils/opcode");
+class BusController {
+    ControlBus;
+    DataBus;
+    controlBusListeners;
+    dataBusListeners;
+    constructor() {
         this.ControlBus = 0;
         this.DataBus = 0;
-        this.controlBusListeners = [];
-        this.dataBusListeners = [];
+        this.controlBusListeners = {};
+        this.dataBusListeners = {};
     }
-    BusController.prototype.setControlBus = function (data) {
+    setControlBus(data) {
+        const { opcode } = (0, opcode_1.OpcodeSeparator)(data);
         this.ControlBus = data;
-        this.controlBusListeners.forEach(function (e) {
+        this.controlBusListeners[opcode]?.forEach(e => {
             e(data);
         });
-    };
-    BusController.prototype.hardCodeControlBus = function (opcode, operand) {
+    }
+    hardCodeControlBus(opcode, operand) {
         // Bitwdith / 2
-        var halfBitWidth = _1.BitWidth / 2;
-        var opcodeFull = "".concat(opcode.toString(2)).split("");
-        var operandFull = "".concat(operand.toString(2)).split("");
-        var opcodeFullPadded = __spreadArray(__spreadArray([], (new Array(halfBitWidth - opcodeFull.length).fill("0")), true), opcodeFull, true);
-        var operandFullPadded = __spreadArray(__spreadArray([], (new Array(halfBitWidth - operandFull.length).fill("0")), true), operandFull, true);
-        this.setControlBus(parseInt(__spreadArray(__spreadArray([], opcodeFullPadded, true), operandFullPadded, true).join(""), 2));
-    };
-    BusController.prototype.registerToControlBus = function (reg) {
+        let halfBitWidth = _1.BitWidth / 2;
+        let opcodeFull = `${opcode.toString(2)}`.split("");
+        let operandFull = `${operand.toString(2)}`.split("");
+        let opcodeFullPadded = [...(new Array(halfBitWidth - opcodeFull.length).fill("0")), ...opcodeFull];
+        let operandFullPadded = [...(new Array(halfBitWidth - operandFull.length).fill("0")), ...operandFull];
+        this.setControlBus(parseInt([...opcodeFullPadded, ...operandFullPadded].join(""), 2));
+    }
+    registerToControlBus(reg) {
         this.setControlBus(reg.getValue());
-    };
-    BusController.prototype.setDataBus = function (data) {
+    }
+    setDataBus(data) {
         this.DataBus = data;
-        this.dataBusListeners.forEach(function (e) {
+        this.dataBusListeners[data]?.forEach(e => {
             e(data);
         });
-    };
-    BusController.prototype.registerToDataBus = function (reg) {
+    }
+    registerToDataBus(reg) {
         this.setDataBus(reg.getValue());
-    };
-    BusController.prototype.getControlBus = function () {
+    }
+    getControlBus() {
         return this.ControlBus;
-    };
-    BusController.prototype.getDataBus = function () {
+    }
+    getDataBus() {
         return this.DataBus;
-    };
-    BusController.prototype.listenToControlBus = function (func) {
-        this.controlBusListeners.push(func);
-    };
-    BusController.prototype.listenToDataBus = function (func) {
-        this.dataBusListeners.push(func);
-    };
-    return BusController;
-}());
+    }
+    listenToControlBus(func, opcode) {
+        if (this.controlBusListeners[opcode] === undefined)
+            this.controlBusListeners[opcode] = [];
+        this.controlBusListeners[opcode].push(func);
+    }
+    listenToDataBus(func, opcode) {
+        if (this.controlBusListeners[opcode] === undefined)
+            this.controlBusListeners[opcode] = [];
+        this.dataBusListeners[opcode].push(func);
+    }
+}
 exports.BusController = BusController;

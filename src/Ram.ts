@@ -32,58 +32,59 @@ export class RAM {
     }
 
     private start() {
+
+
         this.BUS.listenToControlBus((data: number) => {
-            let { opcode, operand } = OpcodeSeparator(data);
+            let { operand } = OpcodeSeparator(data);
 
-
-
-            if (opcode === 0b00000001 && operand === 0b00000000) {
+            if (operand === 0b00000000) {
                 Logger("Seting MAR to: " + this.BUS.getDataBus());
                 this.MAR.setValue(this.BUS.getDataBus());
                 this.MDR.setValue(this.RAM[this.MAR.getValue()]);
             }
-            if (opcode === 0b00000010 && operand === 0b00000001) {
-                Logger("Setting data bus to MDR value");
-                this.BUS.setDataBus(this.MDR.getValue());
-            }
 
-            // Set RIR, Ram Input Register
-            if (opcode === 0b00000001 && operand === 0b00001000) {
+            if (operand === 0b00001000) {
                 Logger("Setting RIR to: " + this.BUS.getDataBus());
                 this.RIR.setValue(this.BUS.getDataBus());
             }
 
-            // set RAR, Ram Address Register
-            if (opcode === 0b00000001 && operand === 0b00001010) {
+            if (operand === 0b00001010) {
                 Logger("Setting RAR to: " + this.BUS.getDataBus());
                 this.RAR.setValue(this.BUS.getDataBus());
             }
 
-            // get ROR, Ram Output Register
-            if (opcode === 0b00000010 && operand === 0b00001001) {
+        }, 0b00000001);
+
+
+
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
+
+            if (operand === 0b00000001) {
+                Logger("Setting data bus to MDR value");
+                this.BUS.setDataBus(this.MDR.getValue());
+            }
+
+            if (operand === 0b00001001) {
                 Logger("Setting data bus to ROR value");
                 this.BUS.setDataBus(this.ROR.getValue());
             }
-
-            // STA
-            if (opcode === 0b00001111) {
-                Logger("Setting RAM value " + this.RAR.getValue() + " to: " + this.RIR.getValue());
-                this.RAM[this.RAR.getValue()] = this.RIR.getValue();
-            }
-
-            // LDA
-            if (opcode === 0b00010000) {
-                Logger("Setting ROR to: " + this.RAM[this.RAR.getValue()]);
-                this.ROR.setValue(this.RAM[this.RAR.getValue()]);
-            }
+        }, 0b00000010);
 
 
+        this.BUS.listenToControlBus((data: number) => {
+            Logger("Setting RAM value " + this.RAR.getValue() + " to: " + this.RIR.getValue());
+            this.RAM[this.RAR.getValue()] = this.RIR.getValue();
+        }, 0b00001111);
+
+        this.BUS.listenToControlBus((data: number) => {
+            Logger("Setting ROR to: " + this.RAM[this.RAR.getValue()]);
+            this.ROR.setValue(this.RAM[this.RAR.getValue()]);
+        }, 0b00010000);
 
 
 
 
 
-
-        });
     }
 }

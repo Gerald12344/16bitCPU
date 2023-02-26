@@ -40,43 +40,61 @@ export class ALU {
 
     private start() {
         this.BUS.listenToControlBus((data: number) => {
-            const { opcode, operand } = OpcodeSeparator(data);
+            let { operand } = OpcodeSeparator(data);
 
-            if (opcode === 0b00000001) {
-                if (operand === 0b00000011) {
-                    Logger("Setting REG_A to: " + this.BUS.getDataBus());
-                    this.REG_A.setValue(this.BUS.getDataBus());
-                    this.calc(this.REG_A.getValue(), this.REG_B.getValue());
-                }
+            if (operand === 0b00000011) {
+                Logger("Setting REG_A to: " + this.BUS.getDataBus());
+                this.REG_A.setValue(this.BUS.getDataBus());
+                this.calc(this.REG_A.getValue(), this.REG_B.getValue());
+            }
 
-                if (operand === 0b00000100) {
-                    Logger("Setting REG_B to: " + this.BUS.getDataBus());
-                    this.REG_B.setValue(this.BUS.getDataBus());
-                    this.calc(this.REG_A.getValue(), this.REG_B.getValue());
-                }
-            };
+            if (operand === 0b00000100) {
+                Logger("Setting REG_B to: " + this.BUS.getDataBus());
+                this.REG_B.setValue(this.BUS.getDataBus());
+                this.calc(this.REG_A.getValue(), this.REG_B.getValue());
+            }
 
-            if (opcode === 0b00001101 && this.Zero) {
+        }, 0b00000001);
+
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
+
+            if (this.Zero) {
                 Logger("Jumping to: " + operand);
 
 
                 this.BUS.hardCodeControlBus(0b00000101, operand);
             }
 
-            if (opcode === 0b00001110 && this.Negative) {
+        }, 0b00001101);
+
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
+
+            if (this.Negative) {
                 Logger("Jumping to: " + operand);
 
 
                 this.BUS.hardCodeControlBus(0b00000101, operand);
             }
 
-            if (opcode === 0b00000010) {
-                if (operand === 0b00000101) {
-                    Logger("Setting data bus to ACC value " + this.ACC.getValue());
-                    this.BUS.setDataBus(this.ACC.getValue());
-                }
+        }, 0b00001110);
+
+
+
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
+
+            if (operand === 0b00000101) {
+                Logger("Setting data bus to ACC value " + this.ACC.getValue());
+                this.BUS.setDataBus(this.ACC.getValue());
             }
-        });
+
+        }, 0b00000010);
+
+
+
+
     }
 
     public calc(a: number, b: number) {

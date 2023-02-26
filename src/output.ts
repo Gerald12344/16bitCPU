@@ -18,19 +18,22 @@ export class OutputReg {
 
     private start() {
         this.BUS.listenToControlBus((data: number) => {
-            let { opcode, operand } = OpcodeSeparator(data);
 
-            if (opcode === 0b00000110) {
-                Logger("OutputReg")
-                console.log(this.REG.getValue())
-            }
+            Logger("OutputReg")
+            console.log(this.REG.getValue())
+        }, 0b00000110);
 
-            if (opcode === 0b00000001 && operand === 0b00000111) {
+        this.BUS.listenToControlBus((data: number) => {
+            let { operand } = OpcodeSeparator(data);
+
+            if (operand === 0b00000111) {
                 Logger("Setting OUT to: " + this.BUS.getDataBus());
                 this.REG.setValue(this.BUS.getDataBus());
             }
 
+        }, 0b00000001);
 
-        });
+
+
     }
 }

@@ -29,21 +29,19 @@ export class GPU {
 
     private start() {
         this.BUS.listenToControlBus((data: number) => {
-            const { opcode, operand } = OpcodeSeparator(data);
+            let { operand } = OpcodeSeparator(data);
 
-            if (opcode === 0b00000001) {
-                if (operand === 0b00001011) {
-                    this.REG_X.setValue(this.BUS.getDataBus());
-                }
-                if (operand === 0b00001100) {
-                    this.REG_Y.setValue(this.BUS.getDataBus());
-                }
-                if (operand === 0b00001101) {
-                    this.COL.setValue(this.BUS.getDataBus());
-                }
+            if (operand === 0b00001011) {
+                this.REG_X.setValue(this.BUS.getDataBus());
             }
+            if (operand === 0b00001100) {
+                this.REG_Y.setValue(this.BUS.getDataBus());
+            }
+            if (operand === 0b00001101) {
+                this.COL.setValue(this.BUS.getDataBus());
+            }
+        }, 0b00001011);
 
-        });
     }
 
     public fetchAllData() {

@@ -5,23 +5,25 @@ import { Register } from "./Register";
 import { OpcodeSeparator } from "./utils/opcode";
 
 
+type emptyFunc = (data: number) => void;
 export class BusController {
     private ControlBus: number;
     private DataBus: number;
 
-    private controlBusListeners: emptyFunc[];
-    private dataBusListeners: emptyFunc[];
+    private controlBusListeners: { [key: number]: emptyFunc[] };
+    private dataBusListeners: { [key: number]: emptyFunc[] };
 
     constructor() {
         this.ControlBus = 0;
         this.DataBus = 0;
-        this.controlBusListeners = [];
-        this.dataBusListeners = [];
+        this.controlBusListeners = {}
+        this.dataBusListeners = {};
     }
 
     public setControlBus(data: number) {
+        const { opcode } = OpcodeSeparator(data);
         this.ControlBus = data;
-        this.controlBusListeners.forEach(e => {
+        this.controlBusListeners[opcode]?.forEach(e => {
             e(data)
         })
 
@@ -49,7 +51,7 @@ export class BusController {
 
     public setDataBus(data: number) {
         this.DataBus = data;
-        this.dataBusListeners.forEach(e => {
+        this.dataBusListeners[data]?.forEach(e => {
             e(data)
         })
     }
@@ -66,12 +68,14 @@ export class BusController {
         return this.DataBus;
     }
 
-    public listenToControlBus(func: emptyFunc) {
-        this.controlBusListeners.push(func);
+    public listenToControlBus(func: emptyFunc, opcode: number) {
+        if (this.controlBusListeners[opcode] === undefined) this.controlBusListeners[opcode] = [];
+        this.controlBusListeners[opcode].push(func);
     }
 
-    public listenToDataBus(func: emptyFunc) {
-        this.dataBusListeners.push(func);
+    public listenToDataBus(func: emptyFunc, opcode: number) {
+        if (this.controlBusListeners[opcode] === undefined) this.controlBusListeners[opcode] = [];
+        this.dataBusListeners[opcode].push(func);
     }
 
 

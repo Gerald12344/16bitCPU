@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "npm run build && npm start",
     "build": "tsc",
-    "start": "bun build/index.js"
+    "start": "bun build/index.js",
+    "slow": "node build/index.js "
   },
   "keywords": [],
   "author": "",
