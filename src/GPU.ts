@@ -19,7 +19,7 @@ export class GPU {
         this.BUS = BUS;
         this.REG_X = GPX;
         this.REG_Y = GPY;
-        this.COL = GPX;
+        this.COL = GPC;
 
         this.screen = new Array(screensize).fill(0).map(() => new Array(screensize).fill(0));
 

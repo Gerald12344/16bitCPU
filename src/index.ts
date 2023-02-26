@@ -3,6 +3,7 @@
 import { ALU } from "./ALU";
 import { BusController } from "./busController";
 import { GeneralPurpose } from "./GeneralPurpose";
+import { GPU } from "./GPU";
 import { OutputReg } from "./output";
 import { ProgramCounter } from "./ProgramCounter";
 import { RAM } from "./Ram";
@@ -70,6 +71,7 @@ let RAM_Comp = new RAM({ MAR, MDR, RAM: CompileASM(), BUS, RIR, ROR, RAR })
 let PCC_Comp = new ProgramCounter({ PC, BUS });
 let ALU_Comp = new ALU({ REG_A, REG_B, ACC, BUS });
 let OUT_Comp = new OutputReg({ BUS, OUT });
+let GPU_Comp = new GPU({ BUS, GPC, GPX, GPY });
 
 
 
