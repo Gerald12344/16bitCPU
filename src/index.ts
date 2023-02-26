@@ -14,7 +14,7 @@ import { OpcodeSeparator } from "./utils/opcode";
 import { Round2DB } from "./utils/round2DB";
 
 let BitWidth = 50;
-let Clock_Hertz = 5000;
+let Clock_Hertz = 5000000;
 const DEBUG = false;
 
 export { BitWidth, Clock_Hertz, DEBUG }
@@ -161,6 +161,6 @@ let total_clock_ticks = 0;
 
     let progEnd = performance.now();
     let progTime = progEnd - progStart;
-    console.log("Program took " + Round2DB(progTime) + "ms to run, with an average clock speed of " + Round2DB(progTime / total_clock_ticks) + "ms per clock tick or " + Round2DB(1000 / (progTime / total_clock_ticks)) + " hertz");
+    console.log("Program took " + Round2DB(progTime) + "ms to run, with an average clock speed of " + Round2DB(progTime / total_clock_ticks) + "ms per clock tick or " + Round2DB(1000 / (progTime / total_clock_ticks)) + " hertz and did " + total_clock_ticks + " clock ticks");
 })();
 

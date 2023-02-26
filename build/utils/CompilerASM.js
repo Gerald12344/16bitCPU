@@ -29,6 +29,9 @@ var Registers = {
     "RIR": 8,
     "ROR": 9,
     "RAR": 10,
+    "GPX": 11,
+    "GPY": 12,
+    "GPC": 13,
 };
 var Flags = {
     "ADD": 0,

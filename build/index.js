@@ -41,6 +41,7 @@ exports.AND = exports.COMP = exports.MOD = exports.DIV = exports.MUL = exports.S
 var ALU_1 = require("./ALU");
 var busController_1 = require("./busController");
 var GeneralPurpose_1 = require("./GeneralPurpose");
+var GPU_1 = require("./GPU");
 var output_1 = require("./output");
 var ProgramCounter_1 = require("./ProgramCounter");
 var Ram_1 = require("./Ram");
@@ -51,7 +52,7 @@ var opcode_1 = require("./utils/opcode");
 var round2DB_1 = require("./utils/round2DB");
 var BitWidth = 50;
 exports.BitWidth = BitWidth;
-var Clock_Hertz = 5000;
+var Clock_Hertz = 5000000;
 exports.Clock_Hertz = Clock_Hertz;
 var DEBUG = false;
 exports.DEBUG = DEBUG;
@@ -68,9 +69,9 @@ var OUT = new Register_1.Register("OUT"); // 0000111
 var RIR = new Register_1.Register("RIR"); // 0001000
 var ROR = new Register_1.Register("ROR"); // 0001001
 var RAR = new Register_1.Register("RAR"); // 0001010
-var GPUX = new Register_1.Register("GPUX");
-var GPUY = new Register_1.Register("GPUY");
-var GPUCOL = new Register_1.Register("GPUCOL");
+var GPX = new Register_1.Register("GPUX");
+var GPY = new Register_1.Register("GPUY");
+var GPC = new Register_1.Register("GPUCOL");
 // Flags
 var HLT = false;
 exports.HLT = HLT;
@@ -107,6 +108,7 @@ var RAM_Comp = new Ram_1.RAM({ MAR: MAR, MDR: MDR, RAM: (0, CompilerASM_1.Compil
 var PCC_Comp = new ProgramCounter_1.ProgramCounter({ PC: PC, BUS: BUS });
 var ALU_Comp = new ALU_1.ALU({ REG_A: REG_A, REG_B: REG_B, ACC: ACC, BUS: BUS });
 var OUT_Comp = new output_1.OutputReg({ BUS: BUS, OUT: OUT });
+var GPU_Comp = new GPU_1.GPU({ BUS: BUS, GPC: GPC, GPX: GPX, GPY: GPY });
 var flagHandler = function (data) {
     var _a;
     _a = [false, false, false, false, false, false, false], exports.ADD = ADD = _a[0], exports.SUB = SUB = _a[1], exports.MUL = MUL = _a[2], exports.DIV = DIV = _a[3], exports.MOD = MOD = _a[4], exports.COMP = COMP = _a[5], exports.AND = AND = _a[6];
@@ -186,7 +188,7 @@ var total_clock_ticks = 0;
             case 3:
                 progEnd = performance.now();
                 progTime = progEnd - progStart;
-                console.log("Program took " + (0, round2DB_1.Round2DB)(progTime) + "ms to run, with an average clock speed of " + (0, round2DB_1.Round2DB)(progTime / total_clock_ticks) + "ms per clock tick or " + (0, round2DB_1.Round2DB)(1000 / (progTime / total_clock_ticks)) + " hertz");
+                console.log("Program took " + (0, round2DB_1.Round2DB)(progTime) + "ms to run, with an average clock speed of " + (0, round2DB_1.Round2DB)(progTime / total_clock_ticks) + "ms per clock tick or " + (0, round2DB_1.Round2DB)(1000 / (progTime / total_clock_ticks)) + " hertz and did " + total_clock_ticks + " clock ticks");
                 return [2 /*return*/];
         }
     });
